@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <title>Mario-Run</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="opening" id="container">
+        <div class="heading">
+          <p>MARIO</p>
+          <p>CLICK TO RUN</p>
+        </div>
+        <div class="mybutton">
+          <button class="start-btn" id="button" type="button">
+            <img class="button-image" src="../static/images/mario.jpg" alt="" />
+            <span>Mario-Run</span>
+          </button>
+        </div>
+      </div>
+      <div class="closing" id="closingContainer">
+        <div class="gameover">
+          <div class="myscore" id="myscore"></div>
+          <button class="start-btn" id="btn" type="button">
+            <img class="button-image" src="../static/images/mario.jpg" alt="" />
+            <span>RETRY</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="counter" id="counter">0</div>
+
+    <canvas class="webgl"></canvas>
+  </body>
+</html>

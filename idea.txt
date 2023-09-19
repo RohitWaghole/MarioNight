@@ -1,0 +1,22 @@
+****
+HOLD
+
+rubik's cube
+****
+
+creating a chrome diano game
+
+-> creating the surface[plane] for diano and hurdles
+-> creating the diano with controls like on spacebar press, it should jump
+-> a scene where the environment is created
+    -> environment 
+    -> some volumetrics
+    -> trees and ground stuff should contain animals
+-> adding obstacles when collide, game should end
+-> adding html and css
+
+
+-> adding daytime and night time seperately 
+-> add the day and night time based on the current time, 
+  if its day then day color sky
+  else it will be night color sky and we can have particles only for the night color sky
