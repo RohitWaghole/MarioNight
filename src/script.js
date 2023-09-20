@@ -49,9 +49,9 @@ const init = () => {
   //     first = false;
   //   }
   // });
-
+  let isGameNotOver = true;
   const jumpNow = () => {
-    if (loadedModel && loadedModel.position.y <= 0.2) {
+    if (loadedModel && loadedModel.position.y <= 0.2 && isGameNotOver) {
       jumpSound.volume = 0.7;
       jumpSound.currentTime = 0;
       jumpSound.play();
@@ -69,16 +69,16 @@ const init = () => {
     "./environment/nz.png",
   ]);
 
-  const groundColorTexture = textureLoader.load("/textures/ground/color.png");
+  const groundColorTexture = textureLoader.load("/textures/ground/color.jpg");
   const groundAmbientOcclusionTexture = textureLoader.load(
-    "/textures/ground/ao.png"
+    "/textures/ground/ao.jpg"
   );
   const groundHeightTexture = textureLoader.load(
-    "/textures/ground/displacement.png"
+    "/textures/ground/displacement.jpg"
   );
-  const groundNormalTexture = textureLoader.load("/textures/ground/normal.png");
+  const groundNormalTexture = textureLoader.load("/textures/ground/normal.jpg");
   const groundRoughnessTexture = textureLoader.load(
-    "/textures/ground/roughness.png"
+    "/textures/ground/roughness.jpg"
   );
 
   groundColorTexture.repeat.set(8, 8);
@@ -217,6 +217,7 @@ const init = () => {
       displacementScale: 0.1,
       normalMap: groundNormalTexture,
       roughnessMap: groundRoughnessTexture,
+      normalScale: new THREE.Vector2(4, 4),
     });
     // material.color = new THREE.Color(0xff00ff);
     mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(130, 130), material);
@@ -255,7 +256,6 @@ const init = () => {
   let cactus = "/models/trees/glb/Standard/Cactus.glb";
   let spruce = "/models/trees/glb/Standard/Spruce.glb";
   let palm = "/models/trees/glb/Standard/Palm.glb";
-  let tree = "/models/trees/glb/Standard/tree.glb";
   const arrayOfStrings = [bush, cactus];
 
   const target = new THREE.Object3D();
@@ -370,10 +370,10 @@ const init = () => {
   let pointLight;
   let hemiLight;
   const lights = () => {
-    const ambientLight = new THREE.AmbientLight();
-    ambientLight.color = new THREE.Color(0xffffff);
-    ambientLight.intensity = 0.4;
-    // scene.add(ambientLight);
+    // const ambientLight = new THREE.AmbientLight();
+    // ambientLight.color = new THREE.Color(0xffffff);
+    // ambientLight.intensity = 0.4;
+    // // scene.add(ambientLight);
 
     directionalLight = new THREE.DirectionalLight(
       "#ffffff",
@@ -385,10 +385,10 @@ const init = () => {
     directionalLight.target.position.copy(target.position);
     directionalLight.target.updateMatrixWorld();
 
-    pointLight = new THREE.PointLight("#ffffff", myObj.pointLightStrength, 5);
-    pointLight.position.set(-9.5, 3.12, 2);
+    // pointLight = new THREE.PointLight("#ffffff", myObj.pointLightStrength, 5);
+    // pointLight.position.set(-9.5, 3.12, 2);
 
-    hemiLight = new THREE.HemisphereLight(0xffeeb1, 0x080820, 1.5);
+    hemiLight = new THREE.HemisphereLight(0xffeeb1, 0x080820, 1.1);
 
     // scene.add(directionalLight, pointLight);
     scene.add(hemiLight, directionalLight);
@@ -464,13 +464,15 @@ const init = () => {
   });
 
   // Making full screen by listening to double click event
-  window.addEventListener("dblclick", () => {
-    if (!document.fullscreenElement) {
-      canvas.requestFullscreen();
-    } else {
-      document.exitFullscreen();
-    }
-  });
+  // window.addEventListener("dblclick", () => {
+  //   if (!document.fullscreenElement) {
+  //     canvas.requestFullscreen();
+  //   } else {
+  //     document.exitFullscreen();
+  //   }
+  // });
+
+  // window.addEventListener("click", jumpNow);
 
   const camera = new THREE.PerspectiveCamera(
     60,
@@ -528,6 +530,19 @@ const init = () => {
         increaser = 0;
         countScore++;
       }
+
+      switch (countScore) {
+        case 500:
+          bgSound.playbackRate = 1.3;
+          break;
+
+        case 1000:
+          bgSound.playbackRate = 1.5;
+          break;
+        case 2000:
+          bgSound.playbackRate = 1.7;
+          break;
+      }
       document.getElementById("counter").innerHTML = countScore;
       for (let i = 0; i < obstacles.length; i++) {
         obstacle = obstacles[i];
@@ -548,6 +563,7 @@ const init = () => {
           const box2 = new THREE.Box3().setFromObject(obstacle);
           if (box1.intersectsBox(box2)) {
             // console.log("Collision detected!");
+            isGameNotOver = false;
             bgSound.pause();
             gameOver.currentTime = 0;
             gameOver.play();
@@ -555,6 +571,7 @@ const init = () => {
             document.getElementById("counter").style.display = "none";
             document.getElementById("myscore").innerHTML =
               "Score: " + countScore;
+
             const getCanvas = document.getElementsByClassName("webgl");
             const gameOverScreen = document.getElementById("closingContainer");
             gameOverScreen.style.display = "block";
@@ -622,6 +639,7 @@ btnOpen.addEventListener("click", () => {
   const container = document.getElementById("container");
   container.style.display = "none";
   bgSound.loop = true;
+  bgSound.playbackRate = 1;
   bgSound.play();
   init();
 });
@@ -633,6 +651,7 @@ btnClose.addEventListener("click", () => {
   container.style.display = "none";
   gameOver.pause();
   bgSound.currentTime = 0;
+  bgSound.playbackRate = 1;
   bgSound.loop = true;
   bgSound.play();
   init();
