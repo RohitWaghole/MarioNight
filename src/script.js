@@ -472,8 +472,6 @@ const init = () => {
   //   }
   // });
 
-  // window.addEventListener("click", jumpNow);
-
   const camera = new THREE.PerspectiveCamera(
     60,
     sizes.width / sizes.height,
@@ -517,6 +515,13 @@ const init = () => {
   // Orbit control to the camera
 
   const clock = new THREE.Clock();
+  let MobileView = window.innerWidth; // Adjust the breakpoint as needed
+  const isMobileView = () => {
+    window.addEventListener("click", jumpNow);
+    camera.aspect = window.innerHeight / window.innerWidth;
+    camera.updateProjectionMatrix();
+  };
+  if (MobileView < 768) isMobileView();
   let previousTime = 0;
   let obstacle;
   let bgObj;
@@ -617,7 +622,6 @@ const init = () => {
       if (mixer) {
         mixer.update(deltaTime);
       }
-
       // Update controls
       controls.update();
       // Renderer
