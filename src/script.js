@@ -515,13 +515,7 @@ const init = () => {
   // Orbit control to the camera
 
   const clock = new THREE.Clock();
-  let MobileView = window.innerWidth; // Adjust the breakpoint as needed
-  const isMobileView = () => {
-    window.addEventListener("click", jumpNow);
-    camera.aspect = window.innerHeight / window.innerWidth;
-    camera.updateProjectionMatrix();
-  };
-  if (MobileView < 768) isMobileView();
+
   let previousTime = 0;
   let obstacle;
   let bgObj;
