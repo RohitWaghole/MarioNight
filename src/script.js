@@ -12,6 +12,10 @@ const gameOver = new Audio("/sounds/gameOver.mp3");
 const click = new Audio("/sounds/click.mp3");
 
 const init = () => {
+  const animatedDiv = document.getElementById("instructions");
+  gsap.to(animatedDiv, { opacity: 1, duration: 1, ease: "power1.inOut" });
+  let first = true;
+
   let isPaused = false;
   const cubeTexture = new THREE.CubeTextureLoader();
   const textureLoader = new THREE.TextureLoader();
@@ -51,6 +55,8 @@ const init = () => {
   // });
   let isGameNotOver = true;
   const jumpNow = () => {
+    if (first)
+      gsap.to(animatedDiv, { opacity: 0, duration: 1, ease: "power1.inOut" });
     if (loadedModel && loadedModel.position.y <= 0.2 && isGameNotOver) {
       jumpSound.volume = 0.7;
       jumpSound.currentTime = 0;
@@ -490,10 +496,6 @@ const init = () => {
   // );
 
   scene.add(camera);
-  // window.addEventListener("click", () => {
-  //   console.log(camera.position);
-  // });
-
   //Ordbit controllers controls
   const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
@@ -570,9 +572,9 @@ const init = () => {
             document.getElementById("counter").style.display = "none";
             document.getElementById("myscore").innerHTML =
               "Score: " + countScore;
-
             const getCanvas = document.getElementsByClassName("webgl");
             const gameOverScreen = document.getElementById("closingContainer");
+            animatedDiv.style.opacity = 0;
             gameOverScreen.style.display = "block";
           }
         }
@@ -628,8 +630,6 @@ const init = () => {
   tick();
   // GUIControls();
 };
-
-// init();
 
 const btnOpen = document.querySelector("#button");
 btnOpen.addEventListener("click", () => {
