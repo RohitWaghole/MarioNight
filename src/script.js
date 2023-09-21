@@ -10,10 +10,29 @@ const jumpSound = new Audio("/sounds/jump.mp3");
 const bgSound = new Audio("/sounds/bgMusic.mp3");
 const gameOver = new Audio("/sounds/gameOver.mp3");
 const click = new Audio("/sounds/click.mp3");
+const levelUp = new Audio("/sounds/levelUp.mp3");
 
 const init = () => {
   const animatedDiv = document.getElementById("instructions");
+  const levels = document.getElementById("levels");
+  levels.style.display = "block";
   gsap.to(animatedDiv, { opacity: 1, duration: 1, ease: "power1.inOut" });
+  gsap.to(levels, {
+    duration: 4,
+    scaleX: 1.7,
+    scaleY: 1.7,
+    opacity: 1,
+    ease: "elastic.out(1, 0.3)",
+    onComplete: function () {
+      gsap.to(levels, {
+        duration: 2,
+        scaleX: 1,
+        scaleY: 1,
+        opacity: 0,
+        ease: "elastic.out(1, 0.3)",
+      });
+    },
+  });
   let first = true;
 
   let isPaused = false;
@@ -523,6 +542,28 @@ const init = () => {
   let bgObj;
   let countScore = 0;
   let increaser = 0;
+  const level = 300;
+  const showLevels = () => {
+    levelUp.play();
+    levels.innerHTML = "LEVEL " + (countScore / level + 1);
+
+    gsap.to(levels, {
+      duration: 4,
+      scaleX: 1.7,
+      scaleY: 1.7,
+      opacity: 1,
+      ease: "elastic.out(1, 0.3)",
+      onComplete: function () {
+        gsap.to(levels, {
+          duration: 2,
+          scaleX: 1,
+          scaleY: 1,
+          opacity: 0,
+          ease: "elastic.out(1, 0.3)",
+        });
+      },
+    });
+  };
   const tick = () => {
     if (!isPaused) {
       clouds.position.x -= 0.01;
@@ -563,7 +604,9 @@ const init = () => {
           const box1 = new THREE.Box3().setFromObject(loadedModel);
           const box2 = new THREE.Box3().setFromObject(obstacle);
           if (box1.intersectsBox(box2)) {
+            // // // stop the gameover scene here // // //
             // console.log("Collision detected!");
+
             isGameNotOver = false;
             bgSound.pause();
             gameOver.currentTime = 0;
@@ -575,6 +618,9 @@ const init = () => {
             const getCanvas = document.getElementsByClassName("webgl");
             const gameOverScreen = document.getElementById("closingContainer");
             animatedDiv.style.opacity = 0;
+            levels.style.display = "none";
+            levels.style.opacity = 0;
+            levels.innerHTML = "LEVEL 1";
             gameOverScreen.style.display = "block";
           }
         }
@@ -615,6 +661,10 @@ const init = () => {
         particles.rotation.y = -elapsedTime * 0.01;
       }
 
+      if (countScore && countScore % level == 0) {
+        showLevels();
+      }
+
       if (mixer) {
         mixer.update(deltaTime);
       }
@@ -630,6 +680,8 @@ const init = () => {
   tick();
   // GUIControls();
 };
+
+// init();
 
 const btnOpen = document.querySelector("#button");
 btnOpen.addEventListener("click", () => {
