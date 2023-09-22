@@ -5,6 +5,11 @@ import * as dat from "dat.gui";
 import gsap from "gsap";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+import Stats from "stats.js";
+
+const stats = new Stats();
+stats.showPanel(0);
+document.body.appendChild(stats.dom);
 
 const jumpSound = new Audio("/sounds/jump.mp3");
 const bgSound = new Audio("/sounds/bgMusic.mp3");
@@ -565,6 +570,7 @@ const init = () => {
     });
   };
   const tick = () => {
+    stats.begin();
     if (!isPaused) {
       clouds.position.x -= 0.01;
       increaser = increaser + 0.1;
@@ -674,6 +680,7 @@ const init = () => {
       renderer.render(scene, camera);
       window.requestAnimationFrame(tick);
     }
+    stats.end();
   };
   controls.enableRotate = false;
 
