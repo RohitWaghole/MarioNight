@@ -11,6 +11,8 @@ const stats = new Stats();
 stats.showPanel(0);
 document.body.appendChild(stats.dom);
 
+let isEverythingLoaded = false;
+
 const jumpSound = new Audio("/sounds/jump.mp3");
 const bgSound = new Audio("/sounds/bgMusic.mp3");
 const gameOver = new Audio("/sounds/gameOver.mp3");
@@ -38,11 +40,30 @@ const init = () => {
       });
     },
   });
-  let first = true;
 
+  let first = true;
   let isPaused = false;
-  const cubeTexture = new THREE.CubeTextureLoader();
-  const textureLoader = new THREE.TextureLoader();
+  const loadingManager = new THREE.LoadingManager(
+    () => {
+      gsap.delayedCall(0.5, () => {
+        bgSound.currentTime = 0;
+        bgSound.loop = true;
+        bgSound.playbackRate = 1;
+        bgSound.play();
+        isEverythingLoaded = true;
+        gsap.to(hiderPlaneMaterial.uniforms.uAlpha, { duration: 2, value: 0 });
+        console.log("Everything loaded");
+      });
+    },
+    (itemUrl, itemsLoaded, itemsTotal) => {
+      // updating the progrss bar
+      // itemsLoaded / itemsTotal will go from 0 to 1
+      const progressRatio = itemsLoaded / itemsTotal;
+      // loadingBarElement.style.transform = `scaleX(${progressRatio})`;
+    }
+  );
+  const cubeTexture = new THREE.CubeTextureLoader(loadingManager);
+  const textureLoader = new THREE.TextureLoader(loadingManager);
   const gltfLoader = new GLTFLoader();
 
   document.getElementById("counter").style.display = "block";
@@ -211,6 +232,26 @@ const init = () => {
 
   // Scene
   const scene = new THREE.Scene();
+
+  // creating a plane
+  const hiderPlane = new THREE.PlaneBufferGeometry(2, 2, 1, 1);
+  const hiderPlaneMaterial = new THREE.ShaderMaterial({
+    transparent: true,
+    uniforms: {
+      uAlpha: { value: 1 },
+    },
+    vertexShader: `
+    void main(){
+      gl_Position = vec4(position, 1.0);
+    }`,
+    fragmentShader: `
+    uniform float uAlpha;
+    void main(){
+      gl_FragColor = vec4(0.0,0.0,0.0,uAlpha);
+    }`,
+  });
+  const hiderPlaneMesh = new THREE.Mesh(hiderPlane, hiderPlaneMaterial);
+  scene.add(hiderPlaneMesh);
 
   // scene.background = new THREE.Color(0x87ceeb); // this is for daytime
   scene.background = new THREE.Color(0x000033); // this is for nighttime
@@ -439,8 +480,7 @@ const init = () => {
     const sky = new THREE.Mesh(skyGeometry, skyMaterial);
     scene.add(sky);
 
-    const cloudTexture = new THREE.TextureLoader();
-    const cloudTex = cloudTexture.load("/textures/cloud/cloud1.png");
+    const cloudTex = textureLoader.load("/textures/cloud/cloud1.png");
 
     const cloudGeometry = new THREE.BufferGeometry();
     const cloudMaterial = new THREE.PointsMaterial({
@@ -569,12 +609,54 @@ const init = () => {
       },
     });
   };
+
+  const obstacleRun = () => {
+    for (let i = 0; i < obstacles.length; i++) {
+      obstacle = obstacles[i];
+      if (obstacle.position.x < 50) {
+        obstacle.visible = true;
+      } else {
+        obstacle.visible = false;
+      }
+
+      obstacle.position.x -= 0.22; // Adjust the speed as needed
+      // Check if the cube has reached its destination
+      if (obstacle.position.x < -70 || i === obstacles.length - 1) {
+        // Remove the cube from the scene
+        obstacle.position.x = 60;
+      }
+      if (loadedModel) {
+        const box1 = new THREE.Box3().setFromObject(loadedModel);
+        const box2 = new THREE.Box3().setFromObject(obstacle);
+        if (box1.intersectsBox(box2)) {
+          // // // stop the gameover scene here // // //
+          // console.log("Collision detected!");
+
+          isGameNotOver = false;
+          bgSound.pause();
+          gameOver.currentTime = 0;
+          gameOver.play();
+          isPaused = true;
+          document.getElementById("counter").style.display = "none";
+          document.getElementById("myscore").innerHTML = "Score: " + countScore;
+          const getCanvas = document.getElementsByClassName("webgl");
+          const gameOverScreen = document.getElementById("closingContainer");
+          animatedDiv.style.opacity = 0;
+          levels.style.display = "none";
+          levels.style.opacity = 0;
+          levels.innerHTML = "LEVEL 1";
+          gameOverScreen.style.display = "block";
+        }
+      }
+    }
+  };
+
   const tick = () => {
     stats.begin();
     if (!isPaused) {
       clouds.position.x -= 0.01;
       increaser = increaser + 0.1;
-      if (increaser >= 1) {
+      if (increaser >= 1 && isEverythingLoaded) {
         increaser = 0;
         countScore++;
       }
@@ -592,45 +674,7 @@ const init = () => {
           break;
       }
       document.getElementById("counter").innerHTML = countScore;
-      for (let i = 0; i < obstacles.length; i++) {
-        obstacle = obstacles[i];
-        if (obstacle.position.x < 50) {
-          obstacle.visible = true;
-        } else {
-          obstacle.visible = false;
-        }
-
-        obstacle.position.x -= 0.22; // Adjust the speed as needed
-        // Check if the cube has reached its destination
-        if (obstacle.position.x < -70 || i === obstacles.length - 1) {
-          // Remove the cube from the scene
-          obstacle.position.x = 60;
-        }
-        if (loadedModel) {
-          const box1 = new THREE.Box3().setFromObject(loadedModel);
-          const box2 = new THREE.Box3().setFromObject(obstacle);
-          if (box1.intersectsBox(box2)) {
-            // // // stop the gameover scene here // // //
-            // console.log("Collision detected!");
-
-            isGameNotOver = false;
-            bgSound.pause();
-            gameOver.currentTime = 0;
-            gameOver.play();
-            isPaused = true;
-            document.getElementById("counter").style.display = "none";
-            document.getElementById("myscore").innerHTML =
-              "Score: " + countScore;
-            const getCanvas = document.getElementsByClassName("webgl");
-            const gameOverScreen = document.getElementById("closingContainer");
-            animatedDiv.style.opacity = 0;
-            levels.style.display = "none";
-            levels.style.opacity = 0;
-            levels.innerHTML = "LEVEL 1";
-            gameOverScreen.style.display = "block";
-          }
-        }
-      }
+      if (isEverythingLoaded) obstacleRun();
       for (let i = 0; i < bgObjects.length; i++) {
         bgObj = bgObjects[i];
 
@@ -695,21 +739,22 @@ btnOpen.addEventListener("click", () => {
   click.play();
   const container = document.getElementById("container");
   container.style.display = "none";
-  bgSound.loop = true;
-  bgSound.playbackRate = 1;
-  bgSound.play();
+  // bgSound.loop = true;
+  // bgSound.playbackRate = 1;
+  // bgSound.play();
   init();
 });
 
 const btnClose = document.querySelector("#btn");
 btnClose.addEventListener("click", () => {
+  isEverythingLoaded = false;
   click.play();
   const container = document.getElementById("closingContainer");
   container.style.display = "none";
   gameOver.pause();
-  bgSound.currentTime = 0;
-  bgSound.playbackRate = 1;
-  bgSound.loop = true;
-  bgSound.play();
+  // bgSound.currentTime = 0;
+  // bgSound.playbackRate = 1;
+  // bgSound.loop = true;
+  // bgSound.play();
   init();
 });
