@@ -52,7 +52,7 @@ const init = () => {
         bgSound.play();
         isEverythingLoaded = true;
         gsap.to(hiderPlaneMaterial.uniforms.uAlpha, { duration: 2, value: 0 });
-        console.log("Everything loaded");
+        // console.log("Everything loaded");
       });
     },
     (itemUrl, itemsLoaded, itemsTotal) => {
@@ -473,49 +473,49 @@ const init = () => {
     lightHelper.visible = false;
     axesHelper.visible = false;
   };
-  let clouds;
-  const addClouds = () => {
-    const skyGeometry = new THREE.SphereGeometry(70, 32, 32); // Adjust the radius and segments as needed
-    const skyMaterial = new THREE.MeshBasicMaterial({ color: 0x87ceeb }); // White color for the sky
-    const sky = new THREE.Mesh(skyGeometry, skyMaterial);
-    scene.add(sky);
+  // let clouds;
+  // const addClouds = () => {
+  //   const skyGeometry = new THREE.SphereGeometry(70, 32, 32); // Adjust the radius and segments as needed
+  //   const skyMaterial = new THREE.MeshBasicMaterial({ color: 0x87ceeb }); // White color for the sky
+  //   const sky = new THREE.Mesh(skyGeometry, skyMaterial);
+  //   scene.add(sky);
 
-    const cloudTex = textureLoader.load("/textures/cloud/cloud1.png");
+  //   const cloudTex = textureLoader.load("/textures/cloud/cloud1.png");
 
-    const cloudGeometry = new THREE.BufferGeometry();
-    const cloudMaterial = new THREE.PointsMaterial({
-      size: 15, // Adjust the size of the clouds
-      map: cloudTex,
-      transparent: true,
-      depthWrite: false,
-      // alphaMap: cloudAlpha,
-    });
+  //   const cloudGeometry = new THREE.BufferGeometry();
+  //   const cloudMaterial = new THREE.PointsMaterial({
+  //     size: 15, // Adjust the size of the clouds
+  //     map: cloudTex,
+  //     transparent: true,
+  //     depthWrite: false,
+  //     // alphaMap: cloudAlpha,
+  //   });
 
-    const cloudCount = 300; // Number of clouds
-    const cloudPositions = [];
+  //   const cloudCount = 300; // Number of clouds
+  //   const cloudPositions = [];
 
-    for (let i = 0; i < cloudCount; i++) {
-      const x = Math.random() * 100 - 50 * Math.random(); // Random x position within the sky sphere
-      const y = 10 + Math.random() * 50; // Random y position within the sky sphere
-      const z = 40 - Math.random() * 100; // Random z position within the sky sphere
+  //   for (let i = 0; i < cloudCount; i++) {
+  //     const x = Math.random() * 100 - 50 * Math.random(); // Random x position within the sky sphere
+  //     const y = 10 + Math.random() * 50; // Random y position within the sky sphere
+  //     const z = 40 - Math.random() * 100; // Random z position within the sky sphere
 
-      cloudPositions.push(x, y, z);
-    }
+  //     cloudPositions.push(x, y, z);
+  //   }
 
-    cloudGeometry.setAttribute(
-      "position",
-      new THREE.Float32BufferAttribute(cloudPositions, 3)
-    );
+  //   cloudGeometry.setAttribute(
+  //     "position",
+  //     new THREE.Float32BufferAttribute(cloudPositions, 3)
+  //   );
 
-    clouds = new THREE.Points(cloudGeometry, cloudMaterial);
-    sky.add(clouds); // Add the cloud particle system to the sky sphere
-  };
+  //   clouds = new THREE.Points(cloudGeometry, cloudMaterial);
+  //   sky.add(clouds); // Add the cloud particle system to the sky sphere
+  // };
   // foggyBackground();
   platform();
   lights();
   dianosaur();
   Helper(directionalLight);
-  addClouds();
+  // addClouds();
   // Adding resizer for window width changes
   window.addEventListener("resize", () => {
     // Updating the sizes
@@ -654,7 +654,7 @@ const init = () => {
   const tick = () => {
     stats.begin();
     if (!isPaused) {
-      clouds.position.x -= 0.01;
+      // clouds.position.x -= 0.01;
       increaser = increaser + 0.1;
       if (increaser >= 1 && isEverythingLoaded) {
         increaser = 0;
