@@ -407,7 +407,7 @@ const init = () => {
     area: { value: 55 },
   };
   let particles;
-  const addGrass = () => {
+  const addStars = () => {
     const particleTexture = textureLoader.load("/particle.png");
     const starsGeometry = new THREE.BufferGeometry();
     const starsMaterial = new THREE.PointsMaterial();
@@ -432,7 +432,7 @@ const init = () => {
     scene.add(particles);
     // console.log("grass added", grassGeometry);
   };
-  addGrass();
+  addStars();
 
   // Lights
   // let myObj = { directionalLightStrength: 0.859, pointLightStrength: 2.636 }; // this is for daytime
@@ -707,7 +707,7 @@ const init = () => {
       previousTime = elapsedTime;
 
       if (particles) {
-        particles.position.y = -elapsedTime * 0.2;
+        particles.position.y = -elapsedTime * 0.1;
         particles.rotation.y = -elapsedTime * 0.01;
       }
 
@@ -726,7 +726,7 @@ const init = () => {
     }
     stats.end();
   };
-  controls.enableRotate = false;
+  // controls.enableRotate = false;
 
   tick();
   // GUIControls();
